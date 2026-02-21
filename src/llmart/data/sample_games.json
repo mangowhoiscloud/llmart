@@ -1,0 +1,35 @@
+[
+  {
+    "game_id": "G001",
+    "title": "Stellar Forge",
+    "genre": "Survival Craft",
+    "developer": "Nova Interactive",
+    "steam_rating": 0.89,
+    "review_count": 12400,
+    "price_usd": 24.99,
+    "release_year": 2025,
+    "tags": ["Open World", "Crafting", "Multiplayer", "Base Building"]
+  },
+  {
+    "game_id": "G002",
+    "title": "Chrono Drift",
+    "genre": "Roguelike",
+    "developer": "Pixel Paradox",
+    "steam_rating": 0.94,
+    "review_count": 8700,
+    "price_usd": 14.99,
+    "release_year": 2025,
+    "tags": ["Roguelike", "Deckbuilder", "Pixel Art", "Singleplayer"]
+  },
+  {
+    "game_id": "G003",
+    "title": "Verdant Kingdom",
+    "genre": "City Builder",
+    "developer": "Green Leaf Studios",
+    "steam_rating": 0.78,
+    "review_count": 3200,
+    "price_usd": 29.99,
+    "release_year": 2024,
+    "tags": ["City Builder", "Management", "Fantasy", "Relaxing"]
+  }
+]

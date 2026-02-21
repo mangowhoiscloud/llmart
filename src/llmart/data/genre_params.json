@@ -1,0 +1,27 @@
+{
+  "Survival Craft": {
+    "r_genre": 0.18,
+    "ltv_mult": 2.8,
+    "discount_rate": 0.15
+  },
+  "Roguelike": {
+    "r_genre": 0.22,
+    "ltv_mult": 2.2,
+    "discount_rate": 0.15
+  },
+  "City Builder": {
+    "r_genre": 0.15,
+    "ltv_mult": 3.1,
+    "discount_rate": 0.15
+  },
+  "Action RPG": {
+    "r_genre": 0.20,
+    "ltv_mult": 2.5,
+    "discount_rate": 0.15
+  },
+  "FPS": {
+    "r_genre": 0.25,
+    "ltv_mult": 1.8,
+    "discount_rate": 0.15
+  }
+}
