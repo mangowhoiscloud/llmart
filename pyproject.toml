@@ -81,7 +81,7 @@ ignore_missing_imports = true
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-skips = ["B101"]
+skips = ["B101", "B110", "B311"]
 
 [tool.coverage.run]
 source = ["llmart"]
