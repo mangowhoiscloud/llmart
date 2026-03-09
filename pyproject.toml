@@ -1,7 +1,7 @@
 [project]
 name = "llmart"
 version = "0.1.0"
-description = "LLMART — Game Selection & Value Inference Pipeline Demo"
+description = "LLMART — Game Selection & Value Inference Pipeline"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -12,14 +12,15 @@ dependencies = [
     "anthropic>=0.42.0",
     "openai>=1.60.0",
     "pydantic>=2.10.0",
-    "pydantic-settings>=2.7.0",
-    "python-dotenv>=1.0.0",
-    "numpy>=2.2.0",
-    "scikit-learn>=1.6.0",
+    "streamlit>=1.40.0",
+    "pandas>=2.2.0",
+    "plotly>=5.0.0",
+    "tenacity>=8.0.0",
 ]
 
 [project.scripts]
 llmart = "llmart.cli:app"
+llmart-ui = "llmart.ui.app:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -43,6 +44,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "ruff>=0.15.2",
     "bandit>=1.8.0",
+    "radon>=6.0.1",
 ]
 
 [tool.ruff]
@@ -56,6 +58,8 @@ ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101", "S106"]
+"src/llmart/ui/pages/*.py" = ["N999"]  # Streamlit multi-page convention: 1_Pipeline.py
+"src/llmart/prompts/*.py" = ["E501"]  # LLM prompt strings must not be line-broken
 
 [tool.mypy]
 python_version = "3.12"
@@ -72,19 +76,20 @@ show_error_codes = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["langgraph.*", "langchain_core.*"]
+module = ["langgraph.*", "langchain_core.*", "streamlit.*", "pandas.*", "plotly.*"]
 ignore_missing_imports = true
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-skips = ["B101"]
+skips = ["B101", "B110", "B311"]
 
 [tool.coverage.run]
 source = ["llmart"]
 branch = true
+omit = ["src/llmart/ui/*"]
 
 [tool.coverage.report]
-fail_under = 0
+fail_under = 70
 show_missing = true
 exclude_lines = [
     "pragma: no cover",

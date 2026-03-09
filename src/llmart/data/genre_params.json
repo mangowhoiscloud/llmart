@@ -2,26 +2,163 @@
   "Survival Craft": {
     "r_genre": 0.18,
     "ltv_mult": 2.8,
-    "discount_rate": 0.15
+    "discount_rate": 0.15,
+    "q1_ratio_type": "live-service"
   },
   "Roguelike": {
     "r_genre": 0.22,
     "ltv_mult": 2.2,
-    "discount_rate": 0.15
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Roguelike Deckbuilder": {
+    "r_genre": 0.20,
+    "ltv_mult": 2.5,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "Action Roguelike": {
+    "r_genre": 0.24,
+    "ltv_mult": 2.0,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Roguelike Mining": {
+    "r_genre": 0.22,
+    "ltv_mult": 2.3,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Roguelike Metroidvania": {
+    "r_genre": 0.21,
+    "ltv_mult": 2.4,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
   },
   "City Builder": {
     "r_genre": 0.15,
     "ltv_mult": 3.1,
-    "discount_rate": 0.15
+    "discount_rate": 0.15,
+    "q1_ratio_type": "live-service"
+  },
+  "Co-op Horror": {
+    "r_genre": 0.28,
+    "ltv_mult": 1.6,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
   },
   "Action RPG": {
     "r_genre": 0.20,
     "ltv_mult": 2.5,
-    "discount_rate": 0.15
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
   },
   "FPS": {
     "r_genre": 0.25,
     "ltv_mult": 1.8,
-    "discount_rate": 0.15
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "Auto Battler": {
+    "r_genre": 0.26,
+    "ltv_mult": 1.9,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "live-service"
+  },
+  "Metroidvania": {
+    "r_genre": 0.21,
+    "ltv_mult": 2.4,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Platformer": {
+    "r_genre": 0.23,
+    "ltv_mult": 1.9,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "Puzzle Platformer": {
+    "r_genre": 0.24,
+    "ltv_mult": 1.8,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "Puzzle": {
+    "r_genre": 0.25,
+    "ltv_mult": 1.7,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "RPG": {
+    "r_genre": 0.18,
+    "ltv_mult": 2.7,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Adventure": {
+    "r_genre": 0.22,
+    "ltv_mult": 2.0,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "Action Adventure": {
+    "r_genre": 0.21,
+    "ltv_mult": 2.2,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "Simulation": {
+    "r_genre": 0.17,
+    "ltv_mult": 2.9,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Farming Sim": {
+    "r_genre": 0.14,
+    "ltv_mult": 3.3,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "live-service"
+  },
+  "Horror": {
+    "r_genre": 0.27,
+    "ltv_mult": 1.7,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "front-loaded"
+  },
+  "Tower Defense": {
+    "r_genre": 0.22,
+    "ltv_mult": 2.1,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Card Game": {
+    "r_genre": 0.20,
+    "ltv_mult": 2.5,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Party Game": {
+    "r_genre": 0.26,
+    "ltv_mult": 1.8,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Immersive Sim": {
+    "r_genre": 0.19,
+    "ltv_mult": 2.6,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "live-service"
+  },
+  "Racing": {
+    "r_genre": 0.25,
+    "ltv_mult": 1.8,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
+  },
+  "Strategy": {
+    "r_genre": 0.19,
+    "ltv_mult": 2.6,
+    "discount_rate": 0.15,
+    "q1_ratio_type": "balanced"
   }
 }
