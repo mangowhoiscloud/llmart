@@ -205,9 +205,7 @@ def _real_llm_judge(  # pragma: no cover
         )
         # Cost tracking: extract token usage from response
         if cost_tracker and resp.usage:
-            cost_tracker.record(
-                "gpt-5.2", resp.usage.prompt_tokens, resp.usage.completion_tokens
-            )
+            cost_tracker.record("gpt-5.2", resp.usage.prompt_tokens, resp.usage.completion_tokens)
         content = resp.choices[0].message.content or "{}"
         try:
             parsed = json.loads(content)
@@ -309,9 +307,7 @@ def _real_primary_only(  # pragma: no cover
         )
         # Cost tracking: extract token usage from response
         if cost_tracker and resp.usage:
-            cost_tracker.record(
-                "gpt-5.2", resp.usage.prompt_tokens, resp.usage.completion_tokens
-            )
+            cost_tracker.record("gpt-5.2", resp.usage.prompt_tokens, resp.usage.completion_tokens)
         content = resp.choices[0].message.content or "{}"
         try:
             parsed = json.loads(content)
@@ -390,8 +386,7 @@ def llm_judge_node(state: GraphState) -> dict[str, Any]:
                 # Circuit/budget broken: fall back to mock for remaining candidates
                 reason = "budget exceeded" if budget_broken else "circuit breaker tripped"
                 errors.append(
-                    f"llm_judge: {reason}, "
-                    f"falling back to mock for {game.get('game_id', '?')}"
+                    f"llm_judge: {reason}, falling back to mock for {game.get('game_id', '?')}"
                 )
                 passes = [_mock_single_pass(game, i) for i in range(K_PASSES)]
                 dim_scores = _aggregate_passes(passes)
