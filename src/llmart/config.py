@@ -46,6 +46,10 @@ class LLMARTConfig:
     escalation_boundary_low: float = 0.48  # narrow boundary zone
     escalation_boundary_high: float = 0.52
 
+    # Budget guardrail — SOT: ~$0.015/game, alert at 80%
+    max_batch_cost_usd: float = 100.0  # conservative pipeline-run limit
+    budget_alert_pct: float = 80.0  # warn at 80% utilization
+
     # Regime monitoring thresholds (Loop 1 + Loop 2)
     regime_genre_bias_max: float = 0.40
     regime_weight_shift_max: float = 0.10

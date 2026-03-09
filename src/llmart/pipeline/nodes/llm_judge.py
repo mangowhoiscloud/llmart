@@ -8,6 +8,7 @@ import os
 import random
 from typing import Any
 
+from llmart.models.cost import BudgetExceededError, CostTracker
 from llmart.models.jury import jury_star_from_passes
 from llmart.pipeline.state import GraphState
 from llmart.prompts.calibrator import CALIBRATOR_SYSTEM, CALIBRATOR_USER
@@ -162,6 +163,7 @@ def _pass3_agreement(passes: list[dict[str, int]], threshold: float = 1.0) -> bo
 @_llm_retry_decorator
 def _real_llm_judge(  # pragma: no cover
     game: dict[str, Any],
+    cost_tracker: CostTracker | None = None,
 ) -> tuple[dict[str, float], float, float, bool, bool, list[dict[str, int]]]:
     """Call real LLM APIs (OpenAI + Anthropic) for scoring.
 
@@ -201,6 +203,11 @@ def _real_llm_judge(  # pragma: no cover
             response_format={"type": "json_object"},
             temperature=JUDGE_TEMPERATURE,
         )
+        # Cost tracking: extract token usage from response
+        if cost_tracker and resp.usage:
+            cost_tracker.record(
+                "gpt-5.2", resp.usage.prompt_tokens, resp.usage.completion_tokens
+            )
         content = resp.choices[0].message.content or "{}"
         try:
             parsed = json.loads(content)
@@ -235,6 +242,13 @@ def _real_llm_judge(  # pragma: no cover
             system=CALIBRATOR_SYSTEM,
             messages=[{"role": "user", "content": cal_prompt}],
         )
+        # Cost tracking: extract token usage from calibrator response
+        if cost_tracker and cal_resp.usage:
+            cost_tracker.record(
+                "claude-opus-4-6",
+                cal_resp.usage.input_tokens,
+                cal_resp.usage.output_tokens,
+            )
         first_block = cal_resp.content[0] if cal_resp.content else None
         cal_text = first_block.text if first_block and hasattr(first_block, "text") else "{}"
         # Strip markdown fences if present (e.g. ```json ... ```)
@@ -255,6 +269,7 @@ def _real_llm_judge(  # pragma: no cover
 @_llm_retry_decorator
 def _real_primary_only(  # pragma: no cover
     game: dict[str, Any],
+    cost_tracker: CostTracker | None = None,
 ) -> tuple[dict[str, float], float, float, bool, bool, list[dict[str, int]]]:
     """Call only GPT Primary (no calibrator) — partial real mode.
 
@@ -292,6 +307,11 @@ def _real_primary_only(  # pragma: no cover
             response_format={"type": "json_object"},
             temperature=JUDGE_TEMPERATURE,
         )
+        # Cost tracking: extract token usage from response
+        if cost_tracker and resp.usage:
+            cost_tracker.record(
+                "gpt-5.2", resp.usage.prompt_tokens, resp.usage.completion_tokens
+            )
         content = resp.choices[0].message.content or "{}"
         try:
             parsed = json.loads(content)
@@ -350,9 +370,15 @@ def llm_judge_node(state: GraphState) -> dict[str, Any]:
     if os.environ.get("LLMART_REAL_API", "").lower() == "true":
         use_real = True
 
+    # Budget guardrail: track LLM API costs (SOT: ~$0.015/game)
+    run_meta = state.get("run_metadata", {})
+    max_cost = float(run_meta.get("max_batch_cost_usd", 100.0))
+    cost_tracker = CostTracker(max_batch_cost_usd=max_cost) if (use_real or use_partial) else None
+
     # Circuit breaker state: track consecutive LLM failures
     consecutive_failures = 0
     circuit_broken = False
+    budget_broken = False
 
     result: list[dict[str, Any]] = []
     for game in candidates:
@@ -360,11 +386,11 @@ def llm_judge_node(state: GraphState) -> dict[str, Any]:
             flagged = False
             pass_dicts: list[dict[str, int | float]] = []
 
-            if (use_real or use_partial) and circuit_broken:
-                # Circuit broken: fall back to mock for remaining candidates
+            if (use_real or use_partial) and (circuit_broken or budget_broken):
+                # Circuit/budget broken: fall back to mock for remaining candidates
+                reason = "budget exceeded" if budget_broken else "circuit breaker tripped"
                 errors.append(
-                    f"llm_judge: circuit breaker tripped after "
-                    f"{_CIRCUIT_BREAKER_THRESHOLD} consecutive failures, "
+                    f"llm_judge: {reason}, "
                     f"falling back to mock for {game.get('game_id', '?')}"
                 )
                 passes = [_mock_single_pass(game, i) for i in range(K_PASSES)]
@@ -374,11 +400,15 @@ def llm_judge_node(state: GraphState) -> dict[str, Any]:
                 delta_cal = _mock_calibrator(passes, agree)
                 pass_dicts = [dict(p) for p in passes]
             elif use_real:
-                dim_scores, jury, delta_cal, agree, flagged, raw_passes = _real_llm_judge(game)
+                dim_scores, jury, delta_cal, agree, flagged, raw_passes = _real_llm_judge(
+                    game, cost_tracker=cost_tracker
+                )
                 pass_dicts = [dict(p) for p in raw_passes]
                 consecutive_failures = 0  # reset on success
             elif use_partial:
-                dim_scores, jury, delta_cal, agree, flagged, raw_passes = _real_primary_only(game)
+                dim_scores, jury, delta_cal, agree, flagged, raw_passes = _real_primary_only(
+                    game, cost_tracker=cost_tracker
+                )
                 pass_dicts = [dict(p) for p in raw_passes]
                 consecutive_failures = 0  # reset on success
             else:
@@ -409,6 +439,9 @@ def llm_judge_node(state: GraphState) -> dict[str, Any]:
                     "flagged": flagged,
                 }
             )
+        except BudgetExceededError as exc:
+            errors.append(f"llm_judge: {exc}")
+            budget_broken = True
         except Exception as exc:
             errors.append(f"llm_judge: {game.get('game_id', '?')}: {exc}")
             if use_real or use_partial:
@@ -420,10 +453,22 @@ def llm_judge_node(state: GraphState) -> dict[str, Any]:
     stage_counts["llm_judge"] = len(result)
     stage_timings = dict(state.get("stage_timings", {}))
 
+    # Include cost summary in monitoring if tracking was active
+    monitoring: dict[str, Any] = {}
+    if cost_tracker:
+        monitoring["llm_cost"] = cost_tracker.summary()
+        alert_pct = float(run_meta.get("budget_alert_pct", 80.0))
+        if cost_tracker.budget_utilization_pct >= alert_pct:
+            errors.append(
+                f"llm_judge: budget alert — {cost_tracker.budget_utilization_pct:.1f}% "
+                f"utilization (${cost_tracker.total_cost_usd:.4f})"
+            )
+
     return {
         "candidates": result,
         "stage": "llm_judge",
         "errors": errors,
         "stage_counts": stage_counts,
         "stage_timings": stage_timings,
+        "monitoring": monitoring,
     }
